@@ -127,7 +127,6 @@ if __name__ == "__main__":
         )
         for cw in df["category_weights"]
     ]
-
     results = []
 
     for keyword, category_weight in tqdm(
@@ -139,20 +138,24 @@ if __name__ == "__main__":
             keyword, category_weight
         )
 
-        prod_avg_time, _ = get_query_time(es_prod, index_name, asis_query)
-        asis_avg_time, _ = get_query_time(es_alpha, index_name, asis_query)
-        idsort_avg_time, _ = get_query_time(es_alpha, index_name, idsort_query)
-        randomsort_avg_time, _ = get_query_time(es_alpha, index_name, randomsort_query)
+        prod_asis_avg_time, _ = get_query_time(es_prod, index_name, asis_query)
+        prod_idsort_avg_time, _ = get_query_time(es_prod, index_name, idsort_query)
+        prod_randomsort_avg_time, _ = get_query_time(es_prod, index_name, randomsort_query)
+        alpha_asis_avg_time, _ = get_query_time(es_alpha, index_name, asis_query)
+        alpha_idsort_avg_time, _ = get_query_time(es_alpha, index_name, idsort_query)
+        alpha_randomsort_avg_time, _ = get_query_time(es_alpha, index_name, randomsort_query)
 
         results.append(
             {
                 "query": keyword,
-                "time_prod_asis": prod_avg_time,
-                "time_prod_idsort_pred": prod_avg_time * (idsort_avg_time / asis_avg_time),
-                "time_prod_randomsort_pred": prod_avg_time * (randomsort_avg_time / asis_avg_time),
-                "time_alpha_asis": asis_avg_time,
-                "time_alpha_idsort": idsort_avg_time,
-                "time_alpha_randomsort": randomsort_avg_time,
+                "time_prod_asis": prod_asis_avg_time,
+                "time_prod_idsort": prod_idsort_avg_time,
+                "time_prod_randomsort": prod_randomsort_avg_time,
+                "time_prod_idsort_pred": prod_asis_avg_time * (alpha_idsort_avg_time / alpha_asis_avg_time),
+                "time_prod_randomsort_pred": prod_asis_avg_time * (alpha_randomsort_avg_time / alpha_asis_avg_time),
+                "time_alpha_asis": alpha_asis_avg_time,
+                "time_alpha_idsort": alpha_idsort_avg_time,
+                "time_alpha_randomsort": alpha_randomsort_avg_time,
             }
         )
     pd.DataFrame(results).to_csv("results.csv", index=False)
