@@ -59,6 +59,39 @@ def get_current_dsl(query):
     }
 
 
+def get_terms_dsl(query, catalog_ids):
+    return {
+        "query": {
+            "bool": {
+                "must": [
+                    {"match": {"serving_title": {"query": query, "operator": "and"}}}
+                ],
+                "filter": [
+                    {"exists": {"field": "catalog_product_set_ids"}},
+                    {"term": {"availability": {"value": "IN_STOCK"}}},
+                    {"terms": {"catalog_id": catalog_ids}}
+                ],
+            }
+        },
+        "_source": [
+            "original_id",
+            "product_id",
+            "catalog_id",
+            "title",
+            "brand_name",
+            "image_url",
+            "landing_url",
+            "price",
+            "sale_price",
+            "catalog_product_set_ids",
+            "sale_price_effective_date_from",
+            "sale_price_effective_date_to",
+            "fast_text_category_name",
+        ],
+        "size": 1000,
+    }
+
+
 def get_category_match_bm25sort_dsl(query, category_weights):
     return {
 
